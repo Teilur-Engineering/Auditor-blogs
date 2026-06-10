@@ -3,6 +3,7 @@
 Fuentes soportadas:
 - Archivo local ``.txt`` / ``.md`` / ``.markdown``
 - Archivo local ``.docx`` (Word / exportado de Google Docs)
+- Archivo local ``.pdf``
 - URL de Google Docs compartida como "cualquiera con el enlace"
 """
 
@@ -13,6 +14,7 @@ from pathlib import Path
 from blog_auditor.exceptions import LoaderError
 from blog_auditor.loaders.docx_loader import load_docx
 from blog_auditor.loaders.gdoc_loader import is_google_doc_url, load_google_doc
+from blog_auditor.loaders.pdf_loader import load_pdf
 from blog_auditor.loaders.text_loader import load_text_file
 
 _TEXT_SUFFIXES = {".txt", ".md", ".markdown"}
@@ -51,8 +53,10 @@ def load_draft_text(source: str) -> str:
         return load_text_file(path)
     if suffix == ".docx":
         return load_docx(path)
+    if suffix == ".pdf":
+        return load_pdf(path)
 
     raise LoaderError(
         f"Formato no soportado: '{suffix or '(sin extensión)'}'. "
-        "Formatos válidos: .txt, .md, .docx o URL de Google Docs."
+        "Formatos válidos: .txt, .md, .docx, .pdf o URL de Google Docs."
     )

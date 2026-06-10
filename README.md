@@ -37,7 +37,7 @@ blog-auditor review examples/borrador-ejemplo.md
 ## Uso
 
 ```bash
-# Archivo local (.md, .txt o .docx)
+# Archivo local (.md, .txt, .docx o .pdf)
 blog-auditor review borrador.docx
 
 # Google Doc compartido como "cualquiera con el enlace puede ver"
@@ -81,6 +81,7 @@ src/blog_auditor/
 │   ├── dispatch.py         # Decide qué loader usar según la fuente
 │   ├── text_loader.py      # .txt / .md (UTF-8 con fallback cp1252)
 │   ├── docx_loader.py      # .docx (convierte headings de Word a Markdown)
+│   ├── pdf_loader.py       # .pdf (pypdf; pierde jerarquía de headings)
 │   └── gdoc_loader.py      # Google Docs vía link público (sin OAuth)
 ├── review/
 │   ├── engine.py           # Orquesta: prompts + LLM + validación (con 1 reintento)
