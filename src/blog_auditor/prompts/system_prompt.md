@@ -38,6 +38,7 @@ Checklist a verificar punto por punto:
 - **Estructura:** ¿un solo H1? ¿H2/H3 en orden lógico y con keywords donde es natural?
 - **Keyword:** ¿aparece en el título, en el primer párrafo y en algún H2, de forma natural y sin stuffing?
 - **Enlaces internos:** el artículo debe tener al menos 2–3 enlaces a otras páginas de Teilur (otros artículos de /insights, pricing, how it works). La auditoría del sitio encontró muchos artículos "huérfanos"; si faltan enlaces internos, es problema crítico.
+  - **Limitación de formato:** los borradores suelen llegar como texto extraído (PDF, export de Google Docs) donde los hipervínculos NO se ven — solo queda el texto del ancla. Si no ves URLs pero hay frases que parecen anclas (menciones a pricing, how it works, otros artículos), indícalo como "verificar enlaces al cargar en Webflow" en mejoras sugeridas. Marca la falta de enlaces internos como problema crítico SOLO cuando tampoco haya ninguna mención/ancla a páginas de Teilur en el cuerpo del artículo.
 - **Longitud:** ¿suficiente profundidad para el tema, o es thin content?
 - **CTA:** ¿termina con una llamada a la acción que lleve al funnel de Teilur? Las páginas sin CTA convierten CERO — la ausencia de CTA es SIEMPRE problema crítico.
 - **Fechas:** usando la fecha actual que se te indica, ¿menciona años desactualizados (ej. "in 2025" cuando ya es 2026)? ¿Promete datos "actuales" que ya no lo son?

@@ -48,4 +48,5 @@ Documentar aquí cada ronda (fecha, artículos usados, diferencias encontradas, 
 
 | Fecha | Artículo | Diferencia detectada | Ajuste al prompt |
 |---|---|---|---|
-| _(pendiente)_ | | | |
+| 2026-06-10 | Blog 2 (publicado, aprobado por la manager) y Blog 18 (sin revisar), ambos PDF | El agente marcó "faltan enlaces internos" como crítico en ambos, pero los PDF no muestran hipervínculos (solo el texto ancla), así que no se puede saber si el doc original los tenía. | Se agregó a la sección SEO la limitación de formato: si no hay URLs visibles pero sí anclas/menciones, pedir "verificar al cargar en Webflow" en vez de problema crítico. |
+| 2026-06-10 | Blog 2 (publicado, aprobado) | Puntaje global 5.2/10 para un artículo que la manager aprobó. Hallazgos principales: cifras sin fuente ("2–4 week hiring delay", "30%–60% cost savings"), párrafos genéricos, transparent pricing solo al cierre. PENDIENTE: confirmar con la manager cuáles de estos hallazgos considera reales y cuáles son ruido, y ajustar la escala. | _(esperando feedback de la manager)_ |
