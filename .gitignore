@@ -1,0 +1,29 @@
+# Entornos y secretos
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Herramientas
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Salidas del agente (pueden contener borradores del cliente)
+reports/
+
+# Editor / SO
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Claude Code (configuración local de la máquina)
+.claude/settings.local.json
