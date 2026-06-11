@@ -28,6 +28,14 @@ class Settings:
     reports_dir: Path
 
 
+@dataclass(frozen=True)
+class SlackSettings:
+    """Credenciales del bot de Slack (solo necesarias en modo Slack)."""
+
+    bot_token: str
+    app_token: str
+
+
 def load_settings(
     model_override: str | None = None,
     *,
@@ -56,3 +64,23 @@ def load_settings(
     reports_dir = Path(os.getenv("REPORTS_DIR", "").strip() or DEFAULT_REPORTS_DIR)
 
     return Settings(openai_api_key=api_key, model=model, reports_dir=reports_dir)
+
+
+def load_slack_settings(*, load_env_file: bool = True) -> SlackSettings:
+    """Carga y valida las credenciales de Slack.
+
+    Raises:
+        ConfigError: si falta alguno de los dos tokens.
+    """
+    if load_env_file:
+        load_dotenv()
+
+    bot_token = os.getenv("SLACK_BOT_TOKEN", "").strip()
+    app_token = os.getenv("SLACK_APP_TOKEN", "").strip()
+    if not bot_token or not app_token:
+        raise ConfigError(
+            "Faltan SLACK_BOT_TOKEN y/o SLACK_APP_TOKEN en el .env. Sigue la guía "
+            "de docs/DESPLIEGUE-SLACK.md para crear la app de Slack y obtenerlos."
+        )
+
+    return SlackSettings(bot_token=bot_token, app_token=app_token)

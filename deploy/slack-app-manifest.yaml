@@ -1,0 +1,29 @@
+# Manifest de la Slack app del Blog Auditor.
+# Uso: https://api.slack.com/apps → Create New App → From a manifest →
+# elegir el workspace → pegar este YAML completo → Create.
+display_information:
+  name: Blog Auditor
+  description: Revisa borradores de blog con el criterio de calidad de Teilur
+  background_color: "#1a5276"
+features:
+  bot_user:
+    display_name: blog-auditor
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - files:read
+      - files:write
+      - im:history
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

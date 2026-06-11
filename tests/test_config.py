@@ -6,13 +6,19 @@ from pathlib import Path
 
 import pytest
 
-from blog_auditor.config import DEFAULT_MODEL, load_settings
+from blog_auditor.config import DEFAULT_MODEL, load_settings, load_slack_settings
 from blog_auditor.exceptions import ConfigError
 
 
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in ("OPENAI_API_KEY", "OPENAI_MODEL", "REPORTS_DIR"):
+    for name in (
+        "OPENAI_API_KEY",
+        "OPENAI_MODEL",
+        "REPORTS_DIR",
+        "SLACK_BOT_TOKEN",
+        "SLACK_APP_TOKEN",
+    ):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -63,3 +69,20 @@ def test_blank_api_key_raises(monkeypatch: pytest.MonkeyPatch) -> None:
 
     with pytest.raises(ConfigError):
         load_settings(load_env_file=False)
+
+
+def test_missing_slack_tokens_raise(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SLACK_BOT_TOKEN", "xoxb-123")
+
+    with pytest.raises(ConfigError, match="SLACK"):
+        load_slack_settings(load_env_file=False)
+
+
+def test_loads_slack_tokens(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SLACK_BOT_TOKEN", "xoxb-123")
+    monkeypatch.setenv("SLACK_APP_TOKEN", "xapp-456")
+
+    slack_settings = load_slack_settings(load_env_file=False)
+
+    assert slack_settings.bot_token == "xoxb-123"
+    assert slack_settings.app_token == "xapp-456"

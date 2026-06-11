@@ -102,6 +102,20 @@ def _run_review(
         typer.secho(f"Reporte guardado en: {report_path}", fg=typer.colors.GREEN, err=True)
 
 
+@app.command()
+def slack() -> None:
+    """Inicia el bot de Slack (Socket Mode). Requiere SLACK_BOT_TOKEN y SLACK_APP_TOKEN."""
+    _configure_console()
+    # Import diferido: el modo CLI no necesita slack_bolt cargado.
+    from blog_auditor.slack.app import run_slack_bot
+
+    try:
+        run_slack_bot()
+    except BlogAuditorError as exc:
+        typer.secho(f"Error: {exc}", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from exc
+
+
 def _default_report_path(settings: Settings, article_title: str) -> Path:
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     return settings.reports_dir / f"{timestamp}-{_slugify(article_title)}.md"
