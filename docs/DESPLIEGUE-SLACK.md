@@ -18,6 +18,11 @@ quede encendido, o donde sea que haya Python e internet.
    - Copiar el token que empieza con `xapp-` → es el `SLACK_APP_TOKEN`.
 5. En **Settings → Install App** → **Install to Workspace** → autorizar.
    - Copiar el **Bot User OAuth Token** que empieza con `xoxb-` → es el `SLACK_BOT_TOKEN`.
+6. En **Features → App Home → Show Tabs**, activar **Messages Tab** y marcar
+   **"Allow users to send Slash commands and messages from the messages tab"**.
+   Sin esto, Slack muestra "Se ha desactivado el envío de mensajes a esta aplicación"
+   y no deja escribirle por DM. (El manifest ya lo trae activado; este paso solo
+   aplica si la app se creó antes de incluirlo o se configuró a mano.)
 
 > Nota: instalar apps en el workspace de Teilur puede requerir aprobación de un
 > admin. Si hay fricción, probar primero en un workspace propio gratuito.
