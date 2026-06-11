@@ -8,7 +8,10 @@ quede encendido, o donde sea que haya Python e internet.
 
 1. Entrar a <https://api.slack.com/apps> → **Create New App** → **From a manifest**.
 2. Elegir el workspace (el de Teilur, o uno propio para probar primero).
-3. Pegar el contenido completo de [deploy/slack-app-manifest.yaml](../deploy/slack-app-manifest.yaml) → **Create**.
+3. Borrar todo lo que traiga el editor y pegar el manifest, según el formato que pida el editor (hay un toggle YAML/JSON arriba):
+   - **JSON** (lo que suele venir por defecto): pegar [deploy/slack-app-manifest.json](../deploy/slack-app-manifest.json).
+   - **YAML**: pegar [deploy/slack-app-manifest.yaml](../deploy/slack-app-manifest.yaml).
+   - Luego **Next** → **Create**.
 4. En **Settings → Basic Information → App-Level Tokens** → **Generate Token and Scopes**:
    - Nombre: `socket-mode`
    - Scope: `connections:write`
