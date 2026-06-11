@@ -51,9 +51,16 @@ blog-auditor review borrador.md --model gpt-5.3
 
 # Solo imprimir, sin guardar reporte
 blog-auditor review borrador.md --no-save
+
+# Iniciar el bot de Slack (requiere tokens, ver docs/DESPLIEGUE-SLACK.md)
+blog-auditor slack
 ```
 
 Por defecto cada reporte se guarda en `reports/` (carpeta ignorada por git porque contiene contenido del cliente).
+
+### Desde Slack (para la redactora y la manager)
+
+Con el bot corriendo (guía completa en [docs/DESPLIEGUE-SLACK.md](docs/DESPLIEGUE-SLACK.md)), basta con enviarle un DM o mencionarlo con: el link de un Google Doc público, un archivo adjunto (`.docx`, `.pdf`, `.md`, `.txt`) o el texto pegado. Responde en el hilo con el resumen de puntajes y el reporte completo adjunto. Keyword opcional: `keyword: toptal pricing` en el mismo mensaje.
 
 ## Configuración
 
@@ -64,6 +71,8 @@ Variables de entorno (archivo `.env`, ver [.env.example](.env.example)):
 | `OPENAI_API_KEY` | Sí | — | API key de OpenAI |
 | `OPENAI_MODEL` | No | `gpt-5.4` | Modelo a usar; se puede bajar a uno más barato sin tocar código |
 | `REPORTS_DIR` | No | `reports` | Carpeta donde se guardan los reportes |
+| `SLACK_BOT_TOKEN` | Solo modo Slack | — | Bot User OAuth Token (`xoxb-...`) |
+| `SLACK_APP_TOKEN` | Solo modo Slack | — | App-Level Token con `connections:write` (`xapp-...`) |
 
 ## Mapa del proyecto
 
@@ -87,9 +96,15 @@ src/blog_auditor/
 │   ├── engine.py           # Orquesta: prompts + LLM + validación (con 1 reintento)
 │   ├── models.py           # Esquema Pydantic del resultado (contrato con el LLM)
 │   └── report.py           # Renderiza el reporte Markdown final
+├── slack/
+│   ├── app.py              # Arranque del bot (Socket Mode)
+│   ├── handlers.py         # Mensajes entrantes → motor → respuesta en hilo
+│   └── formatting.py       # ReviewResult → bloques de resumen de Slack
 └── prompts/
     ├── system_prompt.md    # LA RÚBRICA: el criterio de la manager, dimensión por dimensión
     └── brand_context.md    # Contexto de marca de Teilur (transparent pricing, etc.)
+
+deploy/slack-app-manifest.yaml  # Manifest para crear la Slack app en 5 minutos
 ```
 
 **Para ajustar el criterio de revisión** (lo que se hará durante la calibración): editar [src/blog_auditor/prompts/system_prompt.md](src/blog_auditor/prompts/system_prompt.md). **Para actualizar el contexto de marca**: [src/blog_auditor/prompts/brand_context.md](src/blog_auditor/prompts/brand_context.md). No hay que tocar código Python para ninguna de las dos cosas.
@@ -112,8 +127,8 @@ Los tests no llaman a OpenAI: el motor se prueba con un proveedor falso ([tests/
 
 ## Roadmap
 
-- **Fase 1 (actual):** motor + CLI. Validar calibración con la manager.
-- **Fase 2:** integración con Slack para que la redactora y la manager lo usen sin CLI.
-- **Fase 3:** comando `batch` que audite los ~314 artículos ya publicados en el CMS de Webflow (colección "Blog Posts", slug `/insights`) y cruce calidad con los datos de tráfico del bot de marketing.
+- **Fase 1 (hecha):** motor + CLI. Calibración en curso con artículos reales de la manager (ver [docs/CALIBRACION.md](docs/CALIBRACION.md)).
+- **Fase 2 (hecha, pendiente de desplegar):** bot de Slack para la redactora y la manager (ver [docs/DESPLIEGUE-SLACK.md](docs/DESPLIEGUE-SLACK.md)).
+- **Fase 3:** comando `batch` que audite los ~314 artículos ya publicados en el CMS de Webflow (colección "Blog Posts", slug `/insights`) y cruce calidad con los datos de tráfico del bot de marketing. Se hará después de calibrar.
 
 La idea original y todo el contexto de negocio están en [docs/PROPUESTA-AGENTE-CALIDAD-BLOGS.md](docs/PROPUESTA-AGENTE-CALIDAD-BLOGS.md).
