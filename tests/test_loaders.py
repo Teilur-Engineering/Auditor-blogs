@@ -167,13 +167,25 @@ def test_invalid_pdf_raises(tmp_path: Path) -> None:
 # ── Google Docs ─────────────────────────────────────────────────
 
 
+GDOC_URL = "https://docs.google.com/document/d/abc123XYZ_-/edit?usp=sharing"
+GDOC_URL_DOWNLOAD = "https://docs.google.com/document/d/abc123XYZ_-/export?format=html"
+
+
 class FakeResponse:
-    def __init__(self, status_code: int, text: str) -> None:
+    def __init__(self, status_code: int, text: str, url: str = GDOC_URL_DOWNLOAD) -> None:
         self.status_code = status_code
         self.text = text
+        self.url = url
 
 
-GDOC_URL = "https://docs.google.com/document/d/abc123XYZ_-/edit?usp=sharing"
+GDOC_HTML_BODY = (
+    "<html><body><h1>Toptal Pricing</h1>"
+    "<p>Lee nuestra "
+    '<a href="https://www.google.com/url?q=https://teilurtalent.com/pricing">página de pricing</a> '
+    "y una fuente externa "
+    '<a href="https://www.google.com/url?q=https://glassdoor.com/x">Glassdoor</a>.</p>'
+    "</body></html>"
+)
 
 
 def test_is_google_doc_url() -> None:
@@ -181,15 +193,41 @@ def test_is_google_doc_url() -> None:
     assert not is_google_doc_url("https://teilurtalent.com")
 
 
-def test_loads_public_google_doc(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_loads_public_google_doc_as_html(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_get(url: str, **kwargs: object) -> FakeResponse:
         assert "abc123XYZ_-" in url
-        assert "export?format=txt" in url
-        return FakeResponse(200, "Contenido del borrador desde Google Docs.")
+        assert "export?format=html" in url
+        return FakeResponse(200, GDOC_HTML_BODY)
 
     monkeypatch.setattr(gdoc_loader.httpx, "get", fake_get)
 
-    assert load_google_doc(GDOC_URL) == "Contenido del borrador desde Google Docs."
+    result = load_google_doc(GDOC_URL)
+
+    assert "# Toptal Pricing" in result
+    assert "Lee nuestra página de pricing" in result
+
+
+def test_appends_detected_links_section(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        gdoc_loader.httpx, "get", lambda url, **kw: FakeResponse(200, GDOC_HTML_BODY)
+    )
+
+    result = load_google_doc(GDOC_URL)
+
+    assert "=== ENLACES DETECTADOS EN EL DOCUMENTO ===" in result
+    assert "https://teilurtalent.com/pricing" in result
+    assert "https://glassdoor.com/x" in result
+    # Los redirects de Google deben quedar desenvueltos.
+    assert "google.com/url" not in result
+
+
+def test_reports_when_no_links_detected(monkeypatch: pytest.MonkeyPatch) -> None:
+    html = "<html><body><h1>Sin enlaces</h1><p>Texto suficiente sin links.</p></body></html>"
+    monkeypatch.setattr(gdoc_loader.httpx, "get", lambda url, **kw: FakeResponse(200, html))
+
+    result = load_google_doc(GDOC_URL)
+
+    assert "no contiene hipervínculos" in result
 
 
 def test_private_doc_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -199,11 +237,11 @@ def test_private_doc_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None
         load_google_doc(GDOC_URL)
 
 
-def test_login_page_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_login_redirect_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         gdoc_loader.httpx,
         "get",
-        lambda url, **kw: FakeResponse(200, "<html><body>Sign in</body></html>"),
+        lambda url, **kw: FakeResponse(200, "", url="https://accounts.google.com/signin"),
     )
 
     with pytest.raises(LoaderError, match="login"):
@@ -211,7 +249,9 @@ def test_login_page_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_empty_doc_raises(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(gdoc_loader.httpx, "get", lambda url, **kw: FakeResponse(200, "   "))
+    monkeypatch.setattr(
+        gdoc_loader.httpx, "get", lambda url, **kw: FakeResponse(200, "<html><body></body></html>")
+    )
 
     with pytest.raises(LoaderError, match="vacío"):
         load_google_doc(GDOC_URL)

@@ -41,6 +41,8 @@ blog-auditor review examples/borrador-ejemplo.md
 blog-auditor review borrador.docx
 
 # Google Doc compartido como "cualquiera con el enlace puede ver"
+# (formato preferido: es el único que conserva los hipervínculos, así el
+#  agente verifica de verdad los enlaces internos en vez de adivinar)
 blog-auditor review "https://docs.google.com/document/d/XXXX/edit"
 
 # Indicando la keyword SEO objetivo (si no, el revisor la infiere)
@@ -90,8 +92,9 @@ src/blog_auditor/
 │   ├── dispatch.py         # Decide qué loader usar según la fuente
 │   ├── text_loader.py      # .txt / .md (UTF-8 con fallback cp1252)
 │   ├── docx_loader.py      # .docx (convierte headings de Word a Markdown)
-│   ├── pdf_loader.py       # .pdf (pypdf; pierde jerarquía de headings)
-│   └── gdoc_loader.py      # Google Docs vía link público (sin OAuth)
+│   ├── pdf_loader.py       # .pdf (pypdf; pierde jerarquía de headings y enlaces)
+│   ├── gdoc_loader.py      # Google Docs vía link público (HTML, sin OAuth)
+│   └── html_extract.py     # extrae texto, headings y enlaces del HTML de Google Docs
 ├── review/
 │   ├── engine.py           # Orquesta: prompts + LLM + validación (con 1 reintento)
 │   ├── models.py           # Esquema Pydantic del resultado (contrato con el LLM)
